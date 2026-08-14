@@ -61,12 +61,12 @@ chrome.runtime.onMessage.addListener(
             imageUrl,
           });
 
-          // Wait 30 seconds before signalling ready for next (like Gemini adapter)
-          logger.info('Waiting 30000ms before signalling READY_FOR_NEXT...');
+          // Wait 10 seconds before signalling ready for next (like Gemini adapter)
+          logger.info('Waiting 10000ms before signalling READY_FOR_NEXT...');
           setTimeout(() => {
             logger.info('Sending READY_FOR_NEXT to background.');
             chrome.runtime.sendMessage({ type: 'READY_FOR_NEXT' });
-          }, 30_000);
+          }, 10_000);
         })
         .catch((error) => {
           logger.error(`Generation failed: ${sceneId}`, error);
@@ -76,11 +76,11 @@ chrome.runtime.onMessage.addListener(
             error: error instanceof Error ? error.message : String(error),
           });
 
-          logger.info('Waiting 30000ms before signalling READY_FOR_NEXT after failure...');
+          logger.info('Waiting 10000ms before signalling READY_FOR_NEXT after failure...');
           setTimeout(() => {
             logger.info('Sending READY_FOR_NEXT to background.');
             chrome.runtime.sendMessage({ type: 'READY_FOR_NEXT' });
-          }, 30_000);
+          }, 10_000);
         });
 
       return true;

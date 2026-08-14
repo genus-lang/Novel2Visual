@@ -29,14 +29,11 @@ export class CharacterBible {
     return [...this.characters.values()];
   }
 
-  /**
-   * Returns a compact visual description string for use in prompts.
-   */
   buildVisualDescription(name: string): string | undefined {
     const character = this.get(name);
     if (!character) return undefined;
 
-    const { appearance } = character;
+    const { appearance, visualDescription } = character;
     const parts: string[] = [name];
 
     if (appearance.age) parts.push(`age ${appearance.age}`);
@@ -46,6 +43,11 @@ export class CharacterBible {
     if (appearance.clothing) parts.push(`wearing ${appearance.clothing}`);
     if (character.weapons?.length) parts.push(`wielding ${character.weapons.join(', ')}`);
 
-    return parts.join(', ');
+    let finalDesc = parts.join(', ');
+    if (visualDescription) {
+      finalDesc += `. ${visualDescription}`;
+    }
+
+    return finalDesc;
   }
 }
