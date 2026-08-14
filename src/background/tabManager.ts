@@ -9,6 +9,14 @@ export class TabManager {
 
   async findGeminiTab(): Promise<number | null> {
     const tabs = await chrome.tabs.query({});
+    
+    // Sort so active tabs are checked first, then other tabs
+    tabs.sort((a, b) => {
+      if (a.active && !b.active) return -1;
+      if (!a.active && b.active) return 1;
+      return 0;
+    });
+
     const geminiTab = tabs.find((t) => t.url && isGeminiUrl(t.url));
 
     if (geminiTab?.id) {
@@ -20,6 +28,14 @@ export class TabManager {
 
   async findChatgptTab(): Promise<number | null> {
     const tabs = await chrome.tabs.query({});
+    
+    // Sort so active tabs are checked first, then other tabs
+    tabs.sort((a, b) => {
+      if (a.active && !b.active) return -1;
+      if (!a.active && b.active) return 1;
+      return 0;
+    });
+
     const chatgptTab = tabs.find((t) => t.url && (t.url.includes('chatgpt.com')));
 
     if (chatgptTab?.id) {

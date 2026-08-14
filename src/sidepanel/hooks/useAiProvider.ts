@@ -38,8 +38,15 @@ export function useAiProvider() {
   // Periodic polling for the background connection
   useEffect(() => {
     const checkTabs = async () => {
-      await findAndConnectGemini();
-      await findAndConnectChatgpt();
+      const gTab = await findAndConnectGemini();
+      const cTab = await findAndConnectChatgpt();
+      
+      // Auto-detect platform if only one is connected
+      if (gTab && !cTab) {
+        useGenerationStore.getState().setActiveProvider('gemini');
+      } else if (cTab && !gTab) {
+        useGenerationStore.getState().setActiveProvider('chatgpt');
+      }
     };
     checkTabs();
     const interval = setInterval(checkTabs, 5000);

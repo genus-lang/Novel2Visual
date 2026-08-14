@@ -23,9 +23,17 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
   // We don't return anything here because router.listener() handles the actual routing and returns true/false
 });
 
-// Open side panel when the action button is clicked
+// Disable the global side panel by default (if it was set)
+chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => {});
+
+// Open side panel ONLY on the specific tab when the action button is clicked
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id) {
+    chrome.sidePanel.setOptions({
+      tabId: tab.id,
+      path: 'src/sidepanel/index.html',
+      enabled: true
+    });
     chrome.sidePanel.open({ tabId: tab.id });
   }
 });

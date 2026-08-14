@@ -68,7 +68,7 @@ export class PromptBuilder {
     let raw = parts.join('\n');
 
     // Generate character descriptions block
-    const characterBlock = this.consistency.buildCharacterBlock(scene.characters);
+    const characterBlock = this.consistency.buildCharacterBlock();
     raw = raw.replace('{CHARACTERS_PLACEHOLDER}', characterBlock || 'None specified.');
 
     return { raw, sceneId: scene.id };

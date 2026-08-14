@@ -9,11 +9,12 @@ export class CharacterConsistency {
   /**
    * Generates a markdown block of character descriptions for the prompt.
    */
-  buildCharacterBlock(mentionedNames: string[]): string {
+  buildCharacterBlock(): string {
     const descriptions: string[] = [];
+    const allCharacters = this.bible.all();
 
-    for (const name of mentionedNames) {
-      const desc = this.bible.buildVisualDescription(name);
+    for (const char of allCharacters) {
+      const desc = this.bible.buildVisualDescription(char.name);
       if (desc) descriptions.push(`- ${desc}`);
     }
 
