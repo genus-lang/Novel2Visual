@@ -89,6 +89,7 @@ export default function Gallery() {
                         if (prompt && !isGenerating) {
                           ChromeMessenger.toBackground({
                             type: 'ENQUEUE_SCENES',
+                            provider: useGenerationStore.getState().activeProvider,
                             scenes: [{ sceneId: scene.id, title: scene.title, prompt }]
                           }).catch(console.error);
                         }

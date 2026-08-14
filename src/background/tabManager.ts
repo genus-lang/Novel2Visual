@@ -1,13 +1,11 @@
-// ─── tabManager ───────────────────────────────────────────────────────────────
-// Finds and tracks the Gemini tab.
+// ─── tabManager ────────────────────────────────────────────────────────────────
+// Finds and tracks the AI provider tabs.
 
 import { isGeminiUrl } from '@/utils/validation';
-import { createLogger } from '@/utils/logger';
-
-const logger = createLogger('TabManager');
 
 export class TabManager {
   private geminiTabId: number | null = null;
+  private chatgptTabId: number | null = null;
 
   async findGeminiTab(): Promise<number | null> {
     const tabs = await chrome.tabs.query({});
@@ -15,25 +13,43 @@ export class TabManager {
 
     if (geminiTab?.id) {
       this.geminiTabId = geminiTab.id;
-      logger.info('Gemini tab found:', geminiTab.id, geminiTab.url);
       return geminiTab.id;
     }
-
-    logger.warn('No Gemini tab found');
     return null;
   }
 
-  connect(tabId: number): void {
+  async findChatgptTab(): Promise<number | null> {
+    const tabs = await chrome.tabs.query({});
+    const chatgptTab = tabs.find((t) => t.url && (t.url.includes('chatgpt.com')));
+
+    if (chatgptTab?.id) {
+      this.chatgptTabId = chatgptTab.id;
+      return chatgptTab.id;
+    }
+    return null;
+  }
+
+  connectGemini(tabId: number): void {
     this.geminiTabId = tabId;
-    logger.info('Connected to Gemini tab:', tabId);
+  }
+
+  connectChatgpt(tabId: number): void {
+    this.chatgptTabId = tabId;
   }
 
   getGeminiTabId(): number | null {
     return this.geminiTabId;
   }
 
-  disconnect(): void {
+  getChatgptTabId(): number | null {
+    return this.chatgptTabId;
+  }
+
+  disconnectGemini(): void {
     this.geminiTabId = null;
-    logger.info('Disconnected from Gemini tab');
+  }
+
+  disconnectChatgpt(): void {
+    this.chatgptTabId = null;
   }
 }

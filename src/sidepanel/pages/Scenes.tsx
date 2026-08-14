@@ -69,6 +69,7 @@ export default function Scenes() {
                 if (toEnqueue.length > 0) {
                    ChromeMessenger.toBackground({
                       type: 'ENQUEUE_SCENES',
+                      provider: useGenerationStore.getState().activeProvider,
                       scenes: toEnqueue
                    }).catch(console.error);
                 }

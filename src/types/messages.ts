@@ -10,6 +10,13 @@ export type ExtensionMessage =
   | { type: 'CONNECT_GEMINI_TAB'; tabId: number }
   | { type: 'GEMINI_TAB_CONNECTED'; tabId: number }
   | { type: 'GEMINI_TAB_DISCONNECTED' }
+  | { type: 'FIND_CHATGPT_TAB' }
+  | { type: 'CHATGPT_TAB_FOUND'; tabId: number }
+  | { type: 'CHATGPT_TAB_NOT_FOUND' }
+  | { type: 'CONNECT_CHATGPT_TAB'; tabId: number }
+  | { type: 'CHATGPT_TAB_CONNECTED'; tabId: number }
+  | { type: 'CHATGPT_TAB_DISCONNECTED' }
+  | { type: 'CHATGPT_CONNECTED' }
 
   // ── Generation Lifecycle ────────────────────────────────────────────────────
   | { type: 'START_GENERATION'; jobId: string; projectId: string; chapterId: string }
@@ -18,8 +25,8 @@ export type ExtensionMessage =
   | { type: 'STOP_GENERATION'; jobId: string }
 
   // ── Scene / Prompt Passing ──────────────────────────────────────────────────
-  | { type: 'SEND_GEMINI_PROMPT'; sceneId: string; prompt: string }
-  | { type: 'ENQUEUE_SCENES'; scenes: { sceneId: string; prompt: string; title?: string }[] }
+  | { type: 'SEND_PROMPT'; sceneId: string; prompt: string }
+  | { type: 'ENQUEUE_SCENES'; provider: 'gemini' | 'chatgpt'; scenes: { sceneId: string; prompt: string; title?: string }[] }
   | { type: 'QUEUE_STATE_UPDATED'; status: string; queue: any[]; currentSceneId: string | null }
   | { type: 'SCENE_GENERATION_SUCCESS'; sceneId: string; imageUrl?: string }
   | { type: 'SCENE_GENERATION_FAILED'; sceneId: string; error?: string }

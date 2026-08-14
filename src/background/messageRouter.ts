@@ -24,9 +24,26 @@ export function createBackgroundRouter(
     return true;
   });
 
+  router.on('FIND_CHATGPT_TAB', (_msg, _sender, sendResponse) => {
+    tabManager.findChatgptTab().then((tabId) => {
+      if (tabId !== null) {
+        sendResponse({ type: 'CHATGPT_TAB_FOUND', tabId });
+      } else {
+        sendResponse({ type: 'CHATGPT_TAB_NOT_FOUND' });
+      }
+    });
+    return true;
+  });
+
   router.on('CONNECT_GEMINI_TAB', (msg, _sender, sendResponse) => {
-    tabManager.connect(msg.tabId);
+    tabManager.connectGemini(msg.tabId);
     sendResponse({ type: 'GEMINI_TAB_CONNECTED', tabId: msg.tabId });
+    return true;
+  });
+
+  router.on('CONNECT_CHATGPT_TAB', (msg, _sender, sendResponse) => {
+    tabManager.connectChatgpt(msg.tabId);
+    sendResponse({ type: 'CHATGPT_TAB_CONNECTED', tabId: msg.tabId });
     return true;
   });
 
@@ -45,7 +62,7 @@ export function createBackgroundRouter(
   });
 
   router.on('ENQUEUE_SCENES', (msg) => {
-    jobManager.enqueue(msg.scenes);
+    jobManager.enqueue(msg.scenes, msg.provider);
     return undefined;
   });
 

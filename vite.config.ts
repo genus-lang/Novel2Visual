@@ -12,6 +12,7 @@ export default defineConfig({
       additionalInputs: [
         'src/sidepanel/index.html',
         'src/content/gemini/index.ts',
+        'src/content/chatgpt/index.ts',
         'src/content/novel/index.ts',
         'src/background/index.ts',
       ],

@@ -1,4 +1,4 @@
-﻿// --- jobManager ---------------------------------------------------------------
+// --- jobManager ---------------------------------------------------------------
 // Manages the active generation queue in the background service worker.
 //
 // ARCHITECTURE NOTE:
@@ -25,6 +25,7 @@ interface PersistedState {
   queue: QueueItem[];
   currentItem: QueueItem | null;
   status: 'idle' | 'running' | 'error';
+  provider: 'gemini' | 'chatgpt';
 }
 
 function broadcast(message: ExtensionMessage): void {
@@ -41,6 +42,7 @@ export class JobManager {
   private queue: QueueItem[] = [];
   private currentItem: QueueItem | null = null;
   private status: 'idle' | 'running' | 'error' = 'idle';
+  private provider: 'gemini' | 'chatgpt' = 'gemini';
   private interceptedImageUrl: string | null = null;
 
   constructor(private readonly tabManager: TabManager) {
@@ -57,6 +59,7 @@ export class JobManager {
       this.queue = state.queue ?? [];
       this.currentItem = state.currentItem ?? null;
       this.status = state.status ?? 'idle';
+      this.provider = state.provider ?? 'gemini';
 
       if (this.status === 'running' && this.currentItem) {
         logger.info(`[Background] Resuming interrupted scene: ${this.currentItem.sceneId}`);
@@ -72,6 +75,7 @@ export class JobManager {
       queue: this.queue,
       currentItem: this.currentItem,
       status: this.status,
+      provider: this.provider,
     };
     chrome.storage.session.set({ [STORAGE_KEY]: state });
   }
@@ -86,19 +90,20 @@ export class JobManager {
         if (
           this.status === 'running' &&
           this.currentItem &&
-          details.url.includes('lh3.googleusercontent.com/rd-gg/')
+          (details.url.includes('lh3.googleusercontent.com/rd-gg/') || details.url.includes('files.oaiusercontent.com'))
         ) {
           logger.info(
-            `[Background] Intercepted Gemini image URL from network: ${details.url.slice(0, 80)}...`,
+            `[Background] Intercepted image URL from network: ${details.url.slice(0, 80)}...`,
           );
           this.interceptedImageUrl = details.url;
         }
       },
-      { urls: ['https://lh3.googleusercontent.com/rd-gg/*'] },
+      { urls: ['https://lh3.googleusercontent.com/rd-gg/*', 'https://files.oaiusercontent.com/*'] },
     );
   }
 
-  enqueue(items: QueueItem[]) {
+  enqueue(items: QueueItem[], provider: 'gemini' | 'chatgpt' = 'gemini') {
+    this.provider = provider;
     this.queue.push(...items);
     logger.info(`[Background] Queue updated. ${items.length} items added. Total: ${this.queue.length}`);
     this.broadcastState();
@@ -132,29 +137,30 @@ export class JobManager {
   private dispatchCurrentItem() {
     if (!this.currentItem) return;
     const sceneId = this.currentItem.sceneId;
-    logger.info(`[Background] Dispatching scene: ${sceneId}`);
+    logger.info(`[Background] Dispatching scene: ${sceneId} to ${this.provider}`);
 
-    const tabId = this.tabManager.getGeminiTabId();
+    const tabId = this.provider === 'gemini' ? this.tabManager.getGeminiTabId() : this.tabManager.getChatgptTabId();
+    
     if (tabId === null) {
-      logger.error('[Background] No Gemini tab registered!');
-      this.handleCompletion(sceneId, { error: 'Gemini tab not found. Please connect a Gemini tab first.' });
+      logger.error(`[Background] No ${this.provider} tab registered!`);
+      this.handleCompletion(sceneId, { error: `${this.provider} tab not found. Please connect it first.` });
       return;
     }
 
     chrome.tabs.sendMessage(
       tabId,
       {
-        type: 'SEND_GEMINI_PROMPT',
+        type: 'SEND_PROMPT',
         sceneId,
         prompt: this.currentItem.prompt,
-      } satisfies ExtensionMessage,
+      } as ExtensionMessage,
       () => {
         if (chrome.runtime.lastError) {
           const msg = chrome.runtime.lastError.message ?? '';
-          logger.error(`[Background] Failed to send to Gemini tab: ${msg}`);
+          logger.error(`[Background] Failed to send to ${this.provider} tab: ${msg}`);
           this.status = 'error';
           this.broadcastState();
-          this.handleCompletion(sceneId, { error: `Gemini content script unreachable: ${msg}` });
+          this.handleCompletion(sceneId, { error: `${this.provider} content script unreachable: ${msg}` });
         }
       },
     );

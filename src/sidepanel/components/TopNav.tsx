@@ -1,15 +1,17 @@
 import { Settings, Sparkles } from 'lucide-react';
 import { useNovel } from '../hooks/useNovel';
-import { useGemini } from '../hooks/useGemini';
-import { useEffect } from 'react';
+import { useAiProvider } from '../hooks/useAiProvider';
 
 export default function TopNav() {
   const { activeProject } = useNovel();
-  const { geminiConnected, findAndConnect } = useGemini();
+  const { 
+    activeProvider, setActiveProvider, 
+    geminiConnected, chatgptConnected, 
+    findAndConnectGemini, findAndConnectChatgpt 
+  } = useAiProvider();
 
-  useEffect(() => {
-    void findAndConnect();
-  }, [findAndConnect]);
+  const isConnected = activeProvider === 'gemini' ? geminiConnected : chatgptConnected;
+  const connectFn = activeProvider === 'gemini' ? findAndConnectGemini : findAndConnectChatgpt;
   
   return (
     <div style={{
@@ -39,14 +41,36 @@ export default function TopNav() {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {geminiConnected ? (
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <select 
+            value={activeProvider}
+            onChange={(e) => setActiveProvider(e.target.value as 'gemini' | 'chatgpt')}
+            style={{
+              background: 'var(--bg-2)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-primary)',
+              padding: '4px 8px',
+              borderRadius: 'var(--radius-sm)',
+              fontSize: '11px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          >
+            <option value="gemini">Gemini</option>
+            <option value="chatgpt">ChatGPT</option>
+          </select>
+        </div>
+
+        {isConnected ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--success)', fontWeight: 500 }}>
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }} />
-            Gemini Connected
+            {activeProvider === 'gemini' ? 'Gemini' : 'ChatGPT'} Connected
           </div>
         ) : (
           <button 
-            onClick={() => findAndConnect()}
+            onClick={() => connectFn()}
             style={{ 
               background: 'transparent', border: '1px solid var(--border)', 
               color: 'var(--text-secondary)', padding: '4px 8px', borderRadius: 'var(--radius-sm)', 
@@ -54,7 +78,7 @@ export default function TopNav() {
             }}
           >
             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--warning)' }} />
-            Connect Gemini
+            Connect {activeProvider === 'gemini' ? 'Gemini' : 'ChatGPT'}
           </button>
         )}
         <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>

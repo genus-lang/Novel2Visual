@@ -63,7 +63,7 @@ observer.observe(document.body, { childList: true, subtree: true, attributes: tr
 
 // --- Message listener ---------------------------------------------------------
 chrome.runtime.onMessage.addListener((message: ExtensionMessage, _sender, sendResponse) => {
-  if (message.type === 'SEND_GEMINI_PROMPT') {
+  if (message.type === 'SEND_PROMPT') {
     const { sceneId, prompt } = message;
 
     console.log(`[GeminiContent] Received scene: ${sceneId}`);

@@ -15,7 +15,9 @@
   "host_permissions": [
     "https://gemini.google.com/*",
     "https://aistudio.google.com/*",
-    "https://*.googleusercontent.com/*"
+    "https://*.googleusercontent.com/*",
+    "https://chatgpt.com/*",
+    "https://*.oaiusercontent.com/*"
   ],
   "background": {
     "service_worker": "src/background/index.ts",
@@ -25,6 +27,11 @@
     {
       "matches": ["https://gemini.google.com/*"],
       "js": ["src/content/gemini/index.ts"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["src/content/chatgpt/index.ts"],
       "run_at": "document_idle"
     },
     {

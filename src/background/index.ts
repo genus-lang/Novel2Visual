@@ -30,11 +30,15 @@ chrome.action.onClicked.addListener((tab) => {
   }
 });
 
-// Track tab removal to disconnect Gemini tab if closed
+// Track tab removal to disconnect tabs if closed
 chrome.tabs.onRemoved.addListener((tabId) => {
   if (tabManager.getGeminiTabId() === tabId) {
-    tabManager.disconnect();
+    tabManager.disconnectGemini();
     logger.warn('Gemini tab was closed');
+  }
+  if (tabManager.getChatgptTabId() === tabId) {
+    tabManager.disconnectChatgpt();
+    logger.warn('ChatGPT tab was closed');
   }
 });
 
