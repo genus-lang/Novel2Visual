@@ -1,17 +1,24 @@
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 
-// A tiny valid 1x1 transparent PNG
-const pngHex = "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082";
-const pngBuffer = Buffer.from(pngHex, 'hex');
+const sourceImage = 'C:\\Users\\rinku\\.gemini\\antigravity-ide\\brain\\5b9e8b33-9091-43cb-83e4-ade54b0a6584\\novel2visual_icon_1786733891879.png';
+const publicDir = path.join(process.cwd(), 'public');
 
-const iconsDir = path.join(process.cwd(), 'public', 'icons');
-
-if (!fs.existsSync(iconsDir)) {
-  fs.mkdirSync(iconsDir, { recursive: true });
+if (!fs.existsSync(publicDir)) {
+  fs.mkdirSync(publicDir, { recursive: true });
 }
 
-[16, 32, 48, 128].forEach(size => {
-  fs.writeFileSync(path.join(iconsDir, `icon${size}.png`), pngBuffer);
-  console.log(`Created icon${size}.png`);
-});
+async function resizeIcons() {
+  const sizes = [16, 48, 128];
+  
+  for (const size of sizes) {
+    const outputPath = path.join(publicDir, `icon${size}.png`);
+    await sharp(sourceImage)
+      .resize(size, size)
+      .toFile(outputPath);
+    console.log(`Created icon${size}.png`);
+  }
+}
+
+resizeIcons().catch(console.error);
