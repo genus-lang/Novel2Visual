@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Novel2Visual",
+  "version": "0.1.0",
+  "description": "Turn any web novel chapter into a visual storyboard using your existing Gemini session.",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "downloads",
+    "scripting",
+    "sidePanel",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://gemini.google.com/*",
+    "https://aistudio.google.com/*",
+    "https://*.googleusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["src/content/gemini/index.ts"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://*.novelupdates.com/*",
+        "https://*.wuxiaworld.com/*",
+        "https://*.webnovel.com/*",
+        "https://*.royalroad.com/*",
+        "https://*.scribblehub.com/*",
+        "https://*.novelbin.com/*",
+        "https://*.lightnovelworld.com/*",
+        "*://*/*"
+      ],
+      "js": ["src/content/novel/index.ts"],
+      "run_at": "document_idle"
+    }
+  ],
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "action": {
+    "default_title": "Novel2Visual"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
