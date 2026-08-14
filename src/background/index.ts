@@ -24,17 +24,21 @@ chrome.runtime.onMessage.addListener((message, _sender, _sendResponse) => {
 });
 
 // Disable the global side panel by default (if it was set)
-chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => {});
+if (chrome.sidePanel) {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false }).catch(() => {});
+}
 
 // Open side panel ONLY on the specific tab when the action button is clicked
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id) {
-    chrome.sidePanel.setOptions({
-      tabId: tab.id,
-      path: 'src/sidepanel/index.html',
-      enabled: true
-    });
-    chrome.sidePanel.open({ tabId: tab.id });
+    if (chrome.sidePanel) {
+      chrome.sidePanel.setOptions({
+        tabId: tab.id,
+        path: 'src/sidepanel/index.html',
+        enabled: true
+      });
+      chrome.sidePanel.open({ tabId: tab.id });
+    }
     
     // Prevent this tab from being suspended by Chrome Memory Saver
     chrome.tabs.update(tab.id, { autoDiscardable: false }).catch(() => {});
