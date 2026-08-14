@@ -47,10 +47,12 @@ export class TabManager {
 
   connectGemini(tabId: number): void {
     this.geminiTabId = tabId;
+    chrome.tabs.update(tabId, { autoDiscardable: false }).catch(() => {});
   }
 
   connectChatgpt(tabId: number): void {
     this.chatgptTabId = tabId;
+    chrome.tabs.update(tabId, { autoDiscardable: false }).catch(() => {});
   }
 
   getGeminiTabId(): number | null {
@@ -62,10 +64,16 @@ export class TabManager {
   }
 
   disconnectGemini(): void {
+    if (this.geminiTabId) {
+      chrome.tabs.update(this.geminiTabId, { autoDiscardable: true }).catch(() => {});
+    }
     this.geminiTabId = null;
   }
 
   disconnectChatgpt(): void {
+    if (this.chatgptTabId) {
+      chrome.tabs.update(this.chatgptTabId, { autoDiscardable: true }).catch(() => {});
+    }
     this.chatgptTabId = null;
   }
 }

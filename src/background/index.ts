@@ -35,6 +35,9 @@ chrome.action.onClicked.addListener((tab) => {
       enabled: true
     });
     chrome.sidePanel.open({ tabId: tab.id });
+    
+    // Prevent this tab from being suspended by Chrome Memory Saver
+    chrome.tabs.update(tab.id, { autoDiscardable: false }).catch(() => {});
   }
 });
 
