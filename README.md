@@ -12,6 +12,17 @@ Novel2Visual is a powerful Chrome Extension that acts as an automated pipeline f
 - **Interactive Side Panel**: View your generated scenes, monitor live generation progress, manage the queue, and delete or regenerate specific images.
 - **Batch Export**: Download all generated scenes for a chapter as an organized `.zip` file with a single click.
 
+## 🔄 Extension Workflow
+
+![Novel2Visual Workflow](assets/workflow.png)
+
+1. **Extraction**: The extension injects a content script into your active novel reading tab. It uses NLP techniques to read the chapter's raw text and break it down into chronological "Scenes".
+2. **Contextualization**: It scans each scene to identify the characters, locations, and overall mood, ranking the scenes by importance.
+3. **Prompt Building**: The extension cross-references the detected characters with your custom **Character Bible** and visual style settings, building highly complex and specific generation prompts for each scene.
+4. **Generation Loop**: The Background Service Worker orchestrates a secure queue. It sends one prompt at a time to your active Gemini or ChatGPT tab.
+5. **DOM Automation**: A separate content script running inside the AI tab types out the prompt, submits it, waits for the image to generate, and then extracts the high-resolution image URL.
+6. **Result Handling**: The image URL is passed back to the extension side panel, saved to your local gallery, and the queue automatically advances to the next scene.
+
 ## 🛠️ Architecture & Tech Stack
 
 - **React & TypeScript**: The UI (Sidepanel) is built with React and heavily utilizes standard React hooks and Zustand for state management.
